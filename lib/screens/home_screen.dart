@@ -1,8 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:async';
-import 'package:geotrackerapp/utils/location.dart';
+import 'package:geotrackerapp/components/home_screen/map_component.dart';
+import 'package:geotrackerapp/components/home_screen/content_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,14 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final Completer<GoogleMapController> _controller = Completer();
-  late Future<Position> _position;
-
-  @override
-  void initState() {
-    _position = determinePosition();
-    super.initState();
-  }
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   // getPosition() async {
   //   _position = determinePosition();
@@ -35,47 +27,53 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<Position>(
-        future: _position,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return GoogleMap(
-              mapType: MapType.hybrid,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(
-                  snapshot.data!.latitude,
-                  snapshot.data!.longitude,
-                ),
-                zoom: 17,
-              ),
-              markers: {
-                Marker(
-                  markerId: const MarkerId("home"),
-                  position: LatLng(
-                    snapshot.data!.latitude,
-                    snapshot.data!.longitude,
+      key: _scaffoldKey,
+      endDrawer: Drawer(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 24.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.close,
+                      size: 28,
+                    ),
                   ),
-                ),
-              },
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
-          }
-          return Container(
-            height: double.infinity,
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                CircularProgressIndicator(),
-              ],
-            ),
-          );
-        },
+                  IconButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                    },
+                    icon: const Icon(
+                      Icons.logout,
+                      size: 28,
+                    ),
+                  ),
+                ],
+              ),
+              ListTile(
+                title: const Text('Item 2'),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: Stack(
+        children: [
+          // const MapComponent(),
+          ContentSection(
+            scaffoldKey: _scaffoldKey,
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:geotrackerapp/components/register_screen/form_section.dart';
+import 'package:geotrackerapp/components/register_screen/top_section.dart';
+import 'package:geotrackerapp/utils/auth.dart';
+import 'package:provider/provider.dart';
 
 class ContentSection extends StatefulWidget {
   const ContentSection({Key? key}) : super(key: key);
@@ -10,6 +14,8 @@ class ContentSection extends StatefulWidget {
 class _ContentSectionState extends State<ContentSection> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool isSubmitting = false;
+  String? error;
 
   @override
   void dispose() {
@@ -19,74 +25,33 @@ class _ContentSectionState extends State<ContentSection> {
     super.dispose();
   }
 
+  changeState(String? errorText) {
+    setState(() {
+      isSubmitting = !isSubmitting;
+      error = errorText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: SizedBox(
         height: double.infinity,
+        width: double.infinity,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 35.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
-                "Register",
-                style: TextStyle(
-                  fontSize: 38.0,
-                  fontWeight: FontWeight.bold,
+              if (!isSubmitting) TopComponent(error: error),
+              if (!isSubmitting)
+                FormComponent(
+                  emailController: emailController,
+                  passwordController: passwordController,
+                  changeState: changeState,
                 ),
-              ),
-              const SizedBox(
-                height: 25.0,
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your email',
-                ),
-                style: const TextStyle(fontSize: 20.0),
-              ),
-              const SizedBox(
-                height: 15.0,
-              ),
-              TextFormField(
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your password',
-                ),
-                style: const TextStyle(fontSize: 20.0),
-              ),
-              const SizedBox(
-                height: 15.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Submit",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.green,
-                    ),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                      ),
-                    ),
-                  ),
-                ],
-              )
+              if (isSubmitting) const CircularProgressIndicator(),
             ],
           ),
         ),

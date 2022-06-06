@@ -84,7 +84,11 @@ class _FormComponentState extends State<FormComponent> {
 
                     widget.changeState(null);
                     String? temp;
-                    temp = await context.read<AuthenticationService>().signIn(
+                    // temp = await context.read<AuthenticationService>().signIn(
+                    //       widget.emailController.text,
+                    //       widget.passwordController.text,
+                    //     );
+                    temp = await context.read<AuthenticationService>().signUp(
                           widget.emailController.text,
                           widget.passwordController.text,
                         );
@@ -101,13 +105,13 @@ class _FormComponentState extends State<FormComponent> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  context.read<AuthenticationService>().setScreen("register");
+                  context.read<AuthenticationService>().setScreen("login");
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Colors.green,
                 ),
                 child: const Text(
-                  "Register",
+                  "LogIn",
                   style: TextStyle(
                     fontSize: 22.0,
                   ),
