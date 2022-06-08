@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geotrackerapp/utils/auth.dart';
+import 'package:geotrackerapp/utils/database.dart';
 import 'package:provider/provider.dart';
 
 class FormComponent extends StatefulWidget {
@@ -84,15 +86,17 @@ class _FormComponentState extends State<FormComponent> {
 
                     widget.changeState(null);
                     String? temp;
-                    // temp = await context.read<AuthenticationService>().signIn(
-                    //       widget.emailController.text,
-                    //       widget.passwordController.text,
-                    //     );
                     temp = await context.read<AuthenticationService>().signUp(
                           widget.emailController.text,
                           widget.passwordController.text,
                         );
                     if (temp == "Success") temp = null;
+
+                    await FirestoreHandler(FirebaseFirestore.instance)
+                        .addNewUser(
+                      widget.emailController.text,
+                    );
+
                     widget.changeState(temp);
                   }
                 },

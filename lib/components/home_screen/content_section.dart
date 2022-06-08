@@ -16,7 +16,7 @@ class _ContentSectionState extends State<ContentSection> {
       width: double.infinity,
       child: SizedBox(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          padding: const EdgeInsets.symmetric(vertical: 20.0),
           child: Column(
             children: [
               Row(
@@ -29,7 +29,7 @@ class _ContentSectionState extends State<ContentSection> {
                     icon: const Icon(
                       Icons.menu_rounded,
                       size: 34,
-                      color: Colors.white,
+                      //color: Colors.white,
                     ),
                   ),
                 ],
