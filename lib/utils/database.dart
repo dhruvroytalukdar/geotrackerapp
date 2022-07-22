@@ -18,9 +18,35 @@ class FirestoreHandler {
 
   addNewUser(String email) async {
     try {
-      await _firestore.collection("user").add({"email": email});
+      await _firestore
+          .collection("user")
+          .doc(email)
+          .set({"email": email, "online": false});
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<void> setOnline(String email, bool value) async {
+    try {
+      await _firestore
+          .collection("user")
+          .doc(email)
+          .set({"email": email, "online": value});
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<bool> isOnline(String email) async {
+    try {
+      final rawData = await _firestore.collection("user").doc(email).get();
+      final map = rawData.data();
+      if (map != null) return map["online"];
+      return false;
+    } catch (e) {
+      print(e.toString());
+      return false;
     }
   }
 

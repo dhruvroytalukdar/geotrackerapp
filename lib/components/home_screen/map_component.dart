@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geotrackerapp/utils/auth.dart';
+import 'package:geotrackerapp/utils/constants.dart';
 import 'package:geotrackerapp/utils/database.dart';
 import 'package:geotrackerapp/utils/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -24,15 +25,17 @@ class _MapComponentState extends State<MapComponent> {
   @override
   void initState() {
     _position = determinePosition();
-    _timer = Timer.periodic(const Duration(seconds: 15), (timer) async {
+    _timer =
+        Timer.periodic(const Duration(seconds: pollingRate), (timer) async {
       Position temp = await determinePosition();
       String? email =
-          context.read<AuthenticationService>().currentAuthUser!.email;
+          context.read<AuthenticationService>().currentAuthUser!.email ?? "";
       FirestoreHandler(FirebaseFirestore.instance).updateMyPosition(
         GeoPoint(temp.latitude, temp.longitude),
         timer.tick.toString(),
         email,
       );
+      FirestoreHandler(FirebaseFirestore.instance).setOnline(email, true);
     });
     super.initState();
   }

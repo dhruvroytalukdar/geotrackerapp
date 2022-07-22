@@ -23,13 +23,13 @@ class _ContentSectionState extends State<ContentSection> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       widget.scaffoldKey.currentState!.openEndDrawer();
                     },
                     icon: const Icon(
                       Icons.menu_rounded,
                       size: 34,
-                      //color: Colors.white,
+                      color: Colors.white,
                     ),
                   ),
                 ],

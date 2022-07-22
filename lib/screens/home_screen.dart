@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:geotrackerapp/components/home_screen/map_component.dart';
 import 'package:geotrackerapp/components/home_screen/content_section.dart';
 import 'package:geotrackerapp/utils/auth.dart';
+import 'package:geotrackerapp/utils/constants.dart';
+import 'package:geotrackerapp/utils/database.dart';
 import 'package:geotrackerapp/utils/dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +19,13 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   String? friendEmail;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +68,8 @@ class HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
+                      FirestoreHandler(FirebaseFirestore.instance)
+                          .setOnline(myEmail ?? "", false);
                     },
                     icon: const Icon(
                       Icons.logout,
@@ -87,15 +98,47 @@ class HomeScreenState extends State<HomeScreen> {
                       child: ListView(
                         children:
                             data['friendlist'].map<Widget>((dynamic names) {
+                          final isOnline =
+                              FirestoreHandler(FirebaseFirestore.instance)
+                                  .isOnline(names.toString());
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                names,
+                                names.toString().length > minDisplayLength
+                                    ? "${names.toString().substring(0, minDisplayLength)}..."
+                                    : names,
                                 style: const TextStyle(
                                   fontSize: 19.0,
                                 ),
                               ),
+                              FutureBuilder<bool>(
+                                  future:
+                                      isOnline, // a previously-obtained Future<String> or null
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<bool> onlineSnap) {
+                                    if (onlineSnap.hasData) {
+                                      bool temp = onlineSnap.data ?? false;
+                                      if (temp) {
+                                        return const Text(
+                                          "Online",
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 14),
+                                        );
+                                      }
+                                      return const Text(
+                                        "Offline",
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 14),
+                                      );
+                                    } else if (onlineSnap.hasError) {
+                                      return const Text(
+                                        "Error",
+                                      );
+                                    }
+                                    return const Text("Loading ....");
+                                  }),
                               TextButton(
                                 onPressed: () {
                                   setState(() {
@@ -131,9 +174,4 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // Future<void> _goToTheLake() async {
-  //   final GoogleMapController controller = await _controller.future;
-  //   controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-  // }
 }
